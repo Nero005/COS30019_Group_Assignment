@@ -13,6 +13,7 @@ Outputs (written to output_dir)
   cleaning_report.txt  counts of everything found/fixed (for the report)
 
 Usage : python data_processing.py [path_to_xls] [output_dir]
+        With no arguments it reads ../dataset/Scats Data October 2006.xls and writes to ../processed_data
 Needs : pandas, numpy, and xlrd to read the old .xls format (pip install xlrd)
 
     from data_processing import load_ml_data, inverse_scale
@@ -205,8 +206,10 @@ def inverse_scale(scaled, data_min, data_max):
 
 #main
 def main():
-    src = sys.argv[1] if len(sys.argv) > 1 else "Scats_Data_October_2006.xls"
-    out_dir = Path(sys.argv[2] if len(sys.argv) > 2 else ".")
+    # default paths are relative to the Assignment2B folder, so the script works from any folder
+    root = Path(__file__).resolve().parent.parent
+    src = sys.argv[1] if len(sys.argv) > 1 else root / "dataset" / "Scats Data October 2006.xls"
+    out_dir = Path(sys.argv[2]) if len(sys.argv) > 2 else root / "processed_data"
     out_dir.mkdir(parents=True, exist_ok=True)
 
     raw = load_raw(src)

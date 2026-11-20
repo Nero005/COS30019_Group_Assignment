@@ -1,0 +1,16 @@
+Loaded 4192 rows, 40 sites, 139 location names
+Missing cells in V00-V95: 0; negatives: 0
+True duplicate (detector, date) rows after using detector id: 0
+Dropped detector 3001|CHURCH_ST SW of BARKERS_RD|6: only 2 day(s) of data
+Detectors with fewer than 31 days (kept, gaps filled): 33
+Cells missing after reindexing to a full October timeline (missing days etc.): 11424
+Final matrix: 2976 time steps x 40 sites
+Sites with long (>=2h) zero runs (mostly overnight on minor approaches, so probably genuine low volume): 2846 (14 rows), 4030 (1 rows), 4051 (2 rows), 4821 (31 rows)
+Overall share of zero readings: 0.97%
+Rows with 0/0 coordinates: 31; sites with no valid coordinates: []  -> fill from Traffic_Count_Locations_with_LONG_LAT.csv
+Split by time: train days 1-21, validation days 22-26, test days 27-31
+  train: X (2004, 12, 40), y (2004, 40)
+  val: X (480, 12, 40), y (480, 40)
+  test: X (480, 12, 40), y (480, 40)
+Window: last 12 readings (180 min) -> reading 15 min ahead; scaled with train-only min/max per site
+Saved processed_data.csv, sites.csv, ml_data.npz, cleaning_report.txt to C:\xampp\htdocs\COS30019_Group_Assignment\Assignment2B\processed_data

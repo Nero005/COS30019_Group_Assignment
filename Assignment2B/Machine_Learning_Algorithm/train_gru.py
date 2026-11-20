@@ -1,21 +1,22 @@
 """
 train_gru.py
 
-Steps
-    python data_processing.py Scats_Data_October_2006.xls data      # once
-    python train_gru.py --data data --out results/gru
+Steps (from the Assignment2B folder)
+    python data_cleaning_processing/data_processing.py          # once -> processed_data/
+    python Machine_Learning_Algorithm/train_gru.py               # -> results/gru/
 
 Outputs (in --out): train_gru.pt, metrics.json, loss_curve.png, prediction_<site>.png
 
 Use inside the route guidance system
     from train_gru import TrafficPredictor
-    p = TrafficPredictor("results/gru/train_gru.pt", "data/processed_data.csv")
+    p = TrafficPredictor("results/gru/train_gru.pt", "processed_data/processed_data.csv")
     flows = p.forecast("2006-10-30 08:00", steps=4)   # {site: [cars/15min, ...]}
     per_hour = {s: [f * 4 for f in v] for s, v in flows.items()}
 """
 import argparse
 import json
 import os
+import sys
 import time
 
 import numpy as np
@@ -24,6 +25,9 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 
+# data_processing.py is in ../data_cleaning_processing, so add that folder to the import path
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # the Assignment2B folder
+sys.path.insert(0, os.path.join(ROOT, "data_cleaning_processing"))
 from data_processing import inverse_scale, load_ml_data
 
 DEFAULTS = {
@@ -170,7 +174,9 @@ class TrafficPredictor:
     History comes from processed_data.csv (unscaled flows from data_processing.py)."""
 
     def __init__(self, checkpoint, flows_csv, device="cpu"):
-        ck = torch.load(checkpoint, map_location=device)
+        # weights_only=False: the checkpoint also holds numpy arrays (data_min/data_max),
+        # which torch >= 2.6 refuses to load under its new weights_only=True default.
+        ck = torch.load(checkpoint, map_location=device, weights_only=False)
         cfg = ck["config"]
         self.lookback = int(ck["lookback"])
         if int(ck["horizon"]) != 1:
@@ -206,9 +212,10 @@ class TrafficPredictor:
 
 def main():
     p = argparse.ArgumentParser(description="Train a GRU traffic flow model")
-    p.add_argument("--data", default=".", help="folder containing ml_data.npz")
+    p.add_argument("--data", default=os.path.join(ROOT, "processed_data"),
+                   help="folder containing ml_data.npz")
     p.add_argument("--config", help="optional JSON file overriding the defaults")
-    p.add_argument("--out", default="results/gru")
+    p.add_argument("--out", default=os.path.join(ROOT, "results", "gru"))
     for k, v in DEFAULTS.items():
         p.add_argument(f"--{k}", type=type(v), default=None)
     args = p.parse_args()
