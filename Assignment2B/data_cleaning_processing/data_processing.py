@@ -134,12 +134,14 @@ def flag_zero_runs(raw):
 
 
 def build_sites_table(raw, site_df):
-    """One row per site: median lat/long over its detectors (0/0 rows ignored) and its location names."""
+    """One row per site: median lat/long over its detectors (0/0 rows ignored), its location names,
+    and how many detectors were added together for its flow."""
     loc = raw.copy()
     loc.loc[(loc["NB_LATITUDE"] == 0) | (loc["NB_LONGITUDE"] == 0), ["NB_LATITUDE", "NB_LONGITUDE"]] = np.nan
     n_bad = int(loc["NB_LATITUDE"].isna().sum())
     sites = loc.groupby("site").agg(lat=("NB_LATITUDE", "median"), long=("NB_LONGITUDE", "median"),
-                                    locations=("Location", lambda x: "; ".join(sorted(set(x))))).reset_index()
+                                    locations=("Location", lambda x: "; ".join(sorted(set(x)))),
+                                    detectors=("det", "nunique")).reset_index()   # approaches added into the site flow
     log(f"Rows with 0/0 coordinates: {n_bad}; sites with no valid coordinates: "
         f"{sites.loc[sites['lat'].isna(), 'site'].tolist()}  -> fill from Traffic_Count_Locations_with_LONG_LAT.csv")
     return sites[sites["site"].isin(site_df.columns)]
