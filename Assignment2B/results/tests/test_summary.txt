@@ -1,0 +1,27 @@
+TBRGS test cases: 24 of 24 passed
+
+  id                                                       scenario origin destination             time   model algorithm result
+TC01                  Assignment example trip, weekday morning peak   2000        3002 2006-10-30 08:00 xgboost        AS   PASS
+TC02                    Same trip at night (3am, almost no traffic)   2000        3002 2006-10-31 03:00 xgboost        AS   PASS
+TC03                          Neighbouring sites joined by one road   2000        4043 2006-10-30 08:00 xgboost        AS   PASS
+TC04                          Origin is the same as the destination   2000        2000 2006-10-30 08:00 xgboost        AS   PASS
+TC05               Far-apart sites (south-east to north of the map)   0970        2827 2006-10-30 08:00 xgboost        AS   PASS
+TC06 Origin only reachable through a 'nearest site' link (Richmond)   4812        3180 2006-10-30 08:00 xgboost        AS   PASS
+TC07                       Reverse direction of TC01 (3002 -> 2000)   3002        2000 2006-10-30 08:00 xgboost        AS   PASS
+TC08                        Weekend morning (Saturday 28 Oct 08:00)   2000        3002 2006-10-28 08:00 xgboost        AS   PASS
+TC09                           Time not on a 15-minute step (08:07)   2000        3002 2006-10-30 08:07 xgboost        AS   PASS
+TC10                                       Only one route asked for   2000        3002 2006-10-30 08:00 xgboost        AS   PASS
+TC11                              Depth-First Search on a long trip   0970        2827 2006-10-30 08:00 xgboost       DFS   PASS
+TC12                            Breadth-First Search on a long trip   0970        2827 2006-10-30 08:00 xgboost       BFS   PASS
+TC13                        Greedy Best-First Search on a long trip   0970        2827 2006-10-30 08:00 xgboost      GBFS   PASS
+TC14                      Uniform Cost Search (CUS1) on a long trip   0970        2827 2006-10-30 08:00 xgboost      CUS1   PASS
+TC15                                     IDA* (CUS2) on a long trip   0970        2827 2006-10-30 08:00 xgboost      CUS2   PASS
+TC16                      LSTM model instead of XGBoost (TC01 trip)   2000        3002 2006-10-30 08:00    lstm        AS   PASS
+TC17                       GRU model instead of XGBoost (TC01 trip)   2000        3002 2006-10-30 08:00     gru        AS   PASS
+TC18                       Flow-to-speed conversion at known points                                                         PASS
+TC19                                       Unknown origin site 9999   9999        3002 2006-10-30 08:00 xgboost        AS   PASS
+TC20                        Date outside the data (2 November 2006)   2000        3002 2006-11-02 08:00 xgboost        AS   PASS
+TC21           Time with less than 3 hours of history (1 Oct 01:00)   2000        3002 2006-10-01 01:00 xgboost        AS   PASS
+TC22                                        Text that is not a date   2000        3002            hello xgboost        AS   PASS
+TC23                                          Unknown search method   2000        3002 2006-10-30 08:00 xgboost       XYZ   PASS
+TC24                                                  Unknown model   2000        3002 2006-10-30 08:00     svm        AS   PASS

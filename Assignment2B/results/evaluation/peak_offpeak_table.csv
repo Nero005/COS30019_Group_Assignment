@@ -1,0 +1,11 @@
+model,period,MAE,RMSE,NRMSE,MAPE_%,R2
+LSTM,weekday peak,33.1671,46.1953,0.0675,5.1548,0.9626
+LSTM,other times,22.6329,35.3226,0.1143,12.3921,0.9792
+GRU,weekday peak,34.7609,47.7692,0.0698,5.4040,0.9600
+GRU,other times,22.9213,35.9482,0.1164,12.4229,0.9785
+XGBoost regression,weekday peak,30.7820,44.1498,0.0645,4.7857,0.9658
+XGBoost regression,other times,20.0303,32.6328,0.1056,10.7645,0.9823
+Persistence,weekday peak,57.2225,76.3141,0.1115,9.1091,0.8979
+Persistence,other times,29.5942,46.3645,0.1501,15.3492,0.9642
+Historical average,weekday peak,30.8449,43.4307,0.0635,4.8172,0.9669
+Historical average,other times,33.1954,49.7891,0.1612,16.7699,0.9588
