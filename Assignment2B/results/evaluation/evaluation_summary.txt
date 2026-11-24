@@ -2,9 +2,9 @@ MODEL COMPARISON - test days 27-31 October 2006, all 40 sites, cars per 15 minut
 
 1. Predicting 15 minutes ahead
                        MAE    RMSE  NRMSE  MAPE_%     R2  predict_ms_per_call  train_seconds
-LSTM                23.950  36.858  0.104  11.481  0.982                4.312         59.103
-GRU                 24.401  37.629  0.106  11.540  0.981                7.574         86.999
-XGBoost regression  21.374  34.285  0.096  10.012  0.984               60.094         15.317
+LSTM                23.950  36.858  0.104  11.481  0.982                4.952         59.103
+GRU                 24.401  37.629  0.106  11.540  0.981                8.667         86.999
+XGBoost regression  21.374  34.285  0.096  10.012  0.984               54.266         15.317
 Persistence         33.048  51.078  0.144  14.564  0.965                  NaN            NaN
 Historical average  32.902  49.039  0.138  15.266  0.968                  NaN            NaN
 
