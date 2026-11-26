@@ -1,8 +1,10 @@
 """
-run_tbrgs_tests.py - test cases for the TBRGS (COS30019 Assignment 2B)
+run_software_tests.py - software test cases for the TBRGS (COS30019 Assignment 2B)
+(The machine learning test cases are in run_ml_tests.py.)
 
 Runs every test case on the real Boroondara network (40 SCATS sites, October 2006 data),
 checks the result against what is expected, and saves a results table for the report.
+ST01-ST15 are the main cases for the report; ST16-ST24 are extra cases (appendix).
 
 Every successful route search is also checked automatically:
   - each route starts at the origin and ends at the destination
@@ -12,8 +14,8 @@ Every successful route search is also checked automatically:
   - no more routes than asked for
 
 Run (from the Assignment2B folder, after training the three models):
-    python test_cases/run_tbrgs_tests.py
-Outputs: results/tests/test_results.csv  and  results/tests/test_summary.txt
+    python test_cases/run_software_tests.py
+Outputs: results/tests/software_test_results.csv  and  results/tests/software_test_summary.txt
 """
 import os
 import sys
@@ -35,79 +37,79 @@ EPS = 0.11                     # seconds; times are rounded to 0.1 s
 # A check returns (passed, actual result as text).
 CASES = [
     # ------------------------------------------------------------ normal trips
-    dict(id="TC01", scenario="Assignment example trip, weekday morning peak",
+    dict(id="ST01", scenario="Assignment example trip, weekday morning peak",
          inputs=dict(origin="2000", destination="3002", when=PEAK, model="xgboost", algorithm="AS"),
          expected="5 routes found; A* route 1 is the fastest of them"),
-    dict(id="TC02", scenario="Same trip at night (3am, almost no traffic)",
+    dict(id="ST02", scenario="Same trip at night (3am, almost no traffic)",
          inputs=dict(origin="2000", destination="3002", when=NIGHT, model="xgboost", algorithm="AS"),
-         expected="Every road at the 60 km/h limit; trip faster than TC01 at peak"),
-    dict(id="TC03", scenario="Neighbouring sites joined by one road",
+         expected="Every road at the 60 km/h limit; trip faster than ST01 at peak"),
+    dict(id="ST03", scenario="Neighbouring sites joined by one road",
          inputs=dict(origin="2000", destination="4043", when=PEAK, model="xgboost", algorithm="AS"),
          expected="Fastest route is the direct road 2000 -> 4043"),
-    dict(id="TC04", scenario="Origin is the same as the destination",
+    dict(id="ST04", scenario="Origin is the same as the destination",
          inputs=dict(origin="2000", destination="2000", when=PEAK, model="xgboost", algorithm="AS"),
          expected="One route [2000] with travel time 0"),
-    dict(id="TC05", scenario="Far-apart sites (south-east to north of the map)",
+    dict(id="ST05", scenario="Far-apart sites (south-east to north of the map)",
          inputs=dict(origin="0970", destination="2827", when=PEAK, model="xgboost", algorithm="AS"),
          expected="Route found across the whole network"),
-    dict(id="TC06", scenario="Origin only reachable through a 'nearest site' link (Richmond)",
+    dict(id="ST06", scenario="Origin only reachable through a 'nearest site' link (Richmond)",
          inputs=dict(origin="4812", destination="3180", when=PEAK, model="xgboost", algorithm="AS"),
          expected="Route found; it leaves 4812 through its only link (to 4262)"),
-    dict(id="TC07", scenario="Reverse direction of TC01 (3002 -> 2000)",
+    dict(id="ST16", scenario="Reverse direction of ST01 (3002 -> 2000)",
          inputs=dict(origin="3002", destination="2000", when=PEAK, model="xgboost", algorithm="AS"),
          expected="Route found; uses the same roads in reverse order"),
-    dict(id="TC08", scenario="Weekend morning (Saturday 28 Oct 08:00)",
+    dict(id="ST17", scenario="Weekend morning (Saturday 28 Oct 08:00)",
          inputs=dict(origin="2000", destination="3002", when="2006-10-28 08:00", model="xgboost", algorithm="AS"),
-         expected="Route found; trip not slower than the weekday peak (TC01)"),
-    dict(id="TC09", scenario="Time not on a 15-minute step (08:07)",
+         expected="Route found; trip not slower than the weekday peak (ST01)"),
+    dict(id="ST18", scenario="Time not on a 15-minute step (08:07)",
          inputs=dict(origin="2000", destination="3002", when="2006-10-30 08:07", model="xgboost", algorithm="AS"),
-         expected="Rounded down to 08:00; same result as TC01"),
-    dict(id="TC10", scenario="Only one route asked for",
+         expected="Rounded down to 08:00; same result as ST01"),
+    dict(id="ST19", scenario="Only one route asked for",
          inputs=dict(origin="2000", destination="3002", when=PEAK, model="xgboost", algorithm="AS", max_routes=1),
-         expected="Exactly 1 route, the same as TC01 route 1"),
+         expected="Exactly 1 route, the same as ST01 route 1"),
     # ------------------------------------------------------------ the six search methods
-    dict(id="TC11", scenario="Depth-First Search on a long trip",
+    dict(id="ST07", scenario="Depth-First Search on a long trip",
          inputs=dict(origin="0970", destination="2827", when=PEAK, model="xgboost", algorithm="DFS"),
-         expected="Route found; not faster than the optimal A* route (TC05)"),
-    dict(id="TC12", scenario="Breadth-First Search on a long trip",
+         expected="Route found; not faster than the optimal A* route (ST05)"),
+    dict(id="ST08", scenario="Breadth-First Search on a long trip",
          inputs=dict(origin="0970", destination="2827", when=PEAK, model="xgboost", algorithm="BFS"),
-         expected="Route found; not faster than the optimal A* route (TC05)"),
-    dict(id="TC13", scenario="Greedy Best-First Search on a long trip",
+         expected="Route found; not faster than the optimal A* route (ST05)"),
+    dict(id="ST09", scenario="Greedy Best-First Search on a long trip",
          inputs=dict(origin="0970", destination="2827", when=PEAK, model="xgboost", algorithm="GBFS"),
-         expected="Route found; not faster than the optimal A* route (TC05)"),
-    dict(id="TC14", scenario="Uniform Cost Search (CUS1) on a long trip",
+         expected="Route found; not faster than the optimal A* route (ST05)"),
+    dict(id="ST10", scenario="Uniform Cost Search (CUS1) on a long trip",
          inputs=dict(origin="0970", destination="2827", when=PEAK, model="xgboost", algorithm="CUS1"),
-         expected="Same travel time as A* (TC05): both are optimal"),
-    dict(id="TC15", scenario="IDA* (CUS2) on a long trip",
+         expected="Same travel time as A* (ST05): both are optimal"),
+    dict(id="ST11", scenario="IDA* (CUS2) on a long trip",
          inputs=dict(origin="0970", destination="2827", when=PEAK, model="xgboost", algorithm="CUS2"),
-         expected="Same travel time as A* (TC05): both are optimal"),
+         expected="Same travel time as A* (ST05): both are optimal"),
     # ------------------------------------------------------------ the three models
-    dict(id="TC16", scenario="LSTM model instead of XGBoost (TC01 trip)",
+    dict(id="ST12", scenario="LSTM model instead of XGBoost (ST01 trip)",
          inputs=dict(origin="2000", destination="3002", when=PEAK, model="lstm", algorithm="AS"),
          expected="Route found; travel time within 20% of the XGBoost result"),
-    dict(id="TC17", scenario="GRU model instead of XGBoost (TC01 trip)",
+    dict(id="ST13", scenario="GRU model instead of XGBoost (ST01 trip)",
          inputs=dict(origin="2000", destination="3002", when=PEAK, model="gru", algorithm="AS"),
          expected="Route found; travel time within 20% of the XGBoost result"),
     # ------------------------------------------------------------ travel time formula
-    dict(id="TC18", scenario="Flow-to-speed conversion at known points", kind="formula",
+    dict(id="ST20", scenario="Flow-to-speed conversion at known points", kind="formula",
          expected="Flow 0 and 351 -> 60 km/h (speed limit); 1500 -> 32 km/h; 1 km at 60 km/h = 90 s with delay"),
     # ------------------------------------------------------------ invalid input
-    dict(id="TC19", scenario="Unknown origin site 9999",
+    dict(id="ST14", scenario="Unknown origin site 9999",
          inputs=dict(origin="9999", destination="3002", when=PEAK, model="xgboost", algorithm="AS"),
          expected="Error: site is not one of the 40 SCATS sites"),
-    dict(id="TC20", scenario="Date outside the data (2 November 2006)",
+    dict(id="ST15", scenario="Date outside the data (2 November 2006)",
          inputs=dict(origin="2000", destination="3002", when="2006-11-02 08:00", model="xgboost", algorithm="AS"),
          expected="Error: time must be within the data range"),
-    dict(id="TC21", scenario="Time with less than 3 hours of history (1 Oct 01:00)",
+    dict(id="ST21", scenario="Time with less than 3 hours of history (1 Oct 01:00)",
          inputs=dict(origin="2000", destination="3002", when="2006-10-01 01:00", model="xgboost", algorithm="AS"),
          expected="Error: time must be within the data range"),
-    dict(id="TC22", scenario="Text that is not a date",
+    dict(id="ST22", scenario="Text that is not a date",
          inputs=dict(origin="2000", destination="3002", when="hello", model="xgboost", algorithm="AS"),
          expected="Error: not a valid date and time"),
-    dict(id="TC23", scenario="Unknown search method",
+    dict(id="ST23", scenario="Unknown search method",
          inputs=dict(origin="2000", destination="3002", when=PEAK, model="xgboost", algorithm="XYZ"),
          expected="Error: unknown algorithm"),
-    dict(id="TC24", scenario="Unknown model",
+    dict(id="ST24", scenario="Unknown model",
          inputs=dict(origin="2000", destination="3002", when=PEAK, model="svm", algorithm="AS"),
          expected="Error: unknown model"),
 ]
@@ -152,36 +154,36 @@ def specific_check(case, result, done):
     cid, routes = case["id"], result["routes"]
     fastest = min(r["travel_time_s"] for r in routes) if routes else None
     first = routes[0]["travel_time_s"] if routes else None
-    if cid == "TC01":
+    if cid == "ST01":
         return len(routes) == 5 and abs(first - fastest) <= EPS
-    if cid == "TC02":
+    if cid == "ST02":
         speeds = [leg["speed_kmh"] for r in routes for leg in r["legs"]]
-        return all(abs(s - 60) < 0.01 for s in speeds) and first < done["TC01"]["routes"][0]["travel_time_s"]
-    if cid == "TC03":
+        return all(abs(s - 60) < 0.01 for s in speeds) and first < done["ST01"]["routes"][0]["travel_time_s"]
+    if cid == "ST03":
         best = routes[result["fastest_index"]]["path"]
         return best == ["2000", "4043"]
-    if cid == "TC04":
+    if cid == "ST04":
         return len(routes) == 1 and routes[0]["path"] == ["2000"] and routes[0]["travel_time_s"] == 0
-    if cid in ("TC05", "TC16", "TC17"):
-        if cid == "TC05":
+    if cid in ("ST05", "ST12", "ST13"):
+        if cid == "ST05":
             return bool(routes)
-        ref = done["TC01"]["routes"][0]["travel_time_s"]
+        ref = done["ST01"]["routes"][0]["travel_time_s"]
         return bool(routes) and abs(first - ref) / ref <= 0.20
-    if cid == "TC06":
+    if cid == "ST06":
         return all(r["path"][1] == "4262" for r in routes)
-    if cid == "TC07":
-        return bool(routes) and routes[0]["path"] == list(reversed(done["TC01"]["routes"][0]["path"]))
-    if cid == "TC08":
-        return bool(routes) and first <= done["TC01"]["routes"][0]["travel_time_s"] + EPS
-    if cid == "TC09":
-        ref = done["TC01"]
+    if cid == "ST16":
+        return bool(routes) and routes[0]["path"] == list(reversed(done["ST01"]["routes"][0]["path"]))
+    if cid == "ST17":
+        return bool(routes) and first <= done["ST01"]["routes"][0]["travel_time_s"] + EPS
+    if cid == "ST18":
+        ref = done["ST01"]
         return result["time"] == ref["time"] and routes[0]["path"] == ref["routes"][0]["path"]
-    if cid == "TC10":
-        return len(routes) == 1 and routes[0]["path"] == done["TC01"]["routes"][0]["path"]
-    if cid in ("TC11", "TC12", "TC13"):
-        return bool(routes) and first >= done["TC05"]["routes"][0]["travel_time_s"] - EPS
-    if cid in ("TC14", "TC15"):
-        return bool(routes) and abs(first - done["TC05"]["routes"][0]["travel_time_s"]) <= EPS
+    if cid == "ST19":
+        return len(routes) == 1 and routes[0]["path"] == done["ST01"]["routes"][0]["path"]
+    if cid in ("ST07", "ST08", "ST09"):
+        return bool(routes) and first >= done["ST05"]["routes"][0]["travel_time_s"] - EPS
+    if cid in ("ST10", "ST11"):
+        return bool(routes) and abs(first - done["ST05"]["routes"][0]["travel_time_s"]) <= EPS
     return False
 
 
@@ -205,7 +207,7 @@ def main():
         edges.add((e["to_site"], e["from_site"]))
 
     rows, done = [], {}
-    for case in CASES:
+    for case in sorted(CASES, key=lambda c: c["id"]):
         t0 = time.perf_counter()
         expects_error = case["expected"].startswith("Error")
         if case.get("kind") == "formula":
@@ -226,7 +228,8 @@ def main():
                 passed = expects_error
         seconds = time.perf_counter() - t0
         inputs = case.get("inputs", {})
-        rows.append({"id": case["id"], "scenario": case["scenario"],
+        rows.append({"id": case["id"], "report": "main" if int(case["id"][2:]) <= 15 else "extra",
+                     "scenario": case["scenario"],
                      "origin": inputs.get("origin", ""), "destination": inputs.get("destination", ""),
                      "time": inputs.get("when", ""), "model": inputs.get("model", ""),
                      "algorithm": inputs.get("algorithm", ""), "expected": case["expected"],
@@ -237,15 +240,16 @@ def main():
         print(f"        actual:   {actual}")
 
     table = pd.DataFrame(rows)
-    table.to_csv(os.path.join(OUT_DIR, "test_results.csv"), index=False)
+    table.to_csv(os.path.join(OUT_DIR, "software_test_results.csv"), index=False)
     passed = (table["result"] == "PASS").sum()
-    summary = (f"TBRGS test cases: {passed} of {len(table)} passed\n\n" +
-               table[["id", "scenario", "origin", "destination", "time", "model", "algorithm", "result"]]
+    summary = (f"TBRGS software test cases: {passed} of {len(table)} passed "
+               f"(ST01-ST15 main, ST16-ST24 extra)\n\n" +
+               table[["id", "report", "scenario", "origin", "destination", "time", "model", "algorithm", "result"]]
                .to_string(index=False))
-    with open(os.path.join(OUT_DIR, "test_summary.txt"), "w", encoding="utf-8") as f:
+    with open(os.path.join(OUT_DIR, "software_test_summary.txt"), "w", encoding="utf-8") as f:
         f.write(summary + "\n")
-    print(f"\n{passed} of {len(table)} test cases passed. Saved results/tests/test_results.csv "
-          f"and test_summary.txt")
+    print(f"\n{passed} of {len(table)} software test cases passed. Saved "
+          f"results/tests/software_test_results.csv and software_test_summary.txt")
     return 0 if passed == len(table) else 1
 
 
