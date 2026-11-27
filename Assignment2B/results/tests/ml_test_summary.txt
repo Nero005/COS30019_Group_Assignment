@@ -1,0 +1,21 @@
+TBRGS machine learning test cases: 18 of 18 passed (ML01-ML15 main, ML16-ML18 extra)
+
+  id report                                                   scenario result
+ML01   main     XGBoost: site 2000, Monday 30 Oct 08:00 (morning peak)   PASS
+ML02   main        LSTM: site 2000, Monday 30 Oct 08:00 (morning peak)   PASS
+ML03   main         GRU: site 2000, Monday 30 Oct 08:00 (morning peak)   PASS
+ML04   main           XGBoost: site 2000, Tuesday 31 Oct 03:00 (night)   PASS
+ML05   main              LSTM: site 2000, Tuesday 31 Oct 03:00 (night)   PASS
+ML06   main               GRU: site 2000, Tuesday 31 Oct 03:00 (night)   PASS
+ML07   main       All models: site 2000, Sunday 29 Oct 12:00 (weekend)   PASS
+ML08   main  All models: site 3002, Monday 30 Oct 17:30 (evening peak)   PASS
+ML09   main        All models: hardest site 3001 vs site 2000 at 08:00   PASS
+ML10   main        All models vs persistence baseline (whole test set)   PASS
+ML11   main All models vs historical-average baseline (whole test set)   PASS
+ML12   main                Predicting further ahead (15 vs 60 minutes)   PASS
+ML13   main                    Output validity over the whole test set   PASS
+ML14   main                           Repeatability (same input twice)   PASS
+ML15   main                                Saved results are permanent   PASS
+ML16  extra                         Peak busier than night (site 2000)   PASS
+ML17  extra                           Too little history (1 Oct 01:00)   PASS
+ML18  extra          No data leakage between train / validation / test   PASS

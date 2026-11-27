@@ -1,0 +1,19 @@
+id,report,scenario,expected,actual,result,seconds
+ML01,main,"XGBoost: site 2000, Monday 30 Oct 08:00 (morning peak)",Within 15% of actual,actual 1311; XGBoost regression 1283 (2.1% off),PASS,0.06
+ML02,main,"LSTM: site 2000, Monday 30 Oct 08:00 (morning peak)",Within 15% of actual,actual 1311; LSTM 1352 (3.1% off),PASS,0.6
+ML03,main,"GRU: site 2000, Monday 30 Oct 08:00 (morning peak)",Within 15% of actual,actual 1311; GRU 1356 (3.5% off),PASS,0.25
+ML04,main,"XGBoost: site 2000, Tuesday 31 Oct 03:00 (night)",Within 20 cars of actual,actual 30; XGBoost regression 34 (4 cars off),PASS,0.02
+ML05,main,"LSTM: site 2000, Tuesday 31 Oct 03:00 (night)",Within 20 cars of actual,actual 30; LSTM 24 (6 cars off),PASS,0.0
+ML06,main,"GRU: site 2000, Tuesday 31 Oct 03:00 (night)",Within 20 cars of actual,actual 30; GRU 42 (12 cars off),PASS,0.01
+ML07,main,"All models: site 2000, Sunday 29 Oct 12:00 (weekend)",Each within 15% of actual,"actual 965; LSTM 870 (9.8% off), GRU 883 (8.5% off), XGBoost regression 933 (3.4% off)",PASS,0.03
+ML08,main,"All models: site 3002, Monday 30 Oct 17:30 (evening peak)",Each within 15% of actual,"actual 996; LSTM 968 (2.8% off), GRU 984 (1.2% off), XGBoost regression 978 (1.8% off)",PASS,0.15
+ML09,main,All models: hardest site 3001 vs site 2000 at 08:00,Error at 3001 larger than at 2000 for every model (known weak site),LSTM: 3001 17.4% vs 2000 3.1%; GRU: 3001 17.3% vs 2000 3.5%; XGBoost regression: 3001 15.4% vs 2000 2.1%,PASS,0.06
+ML10,main,All models vs persistence baseline (whole test set),Every model has lower MAE,"baseline MAE 33.05; LSTM 23.95, GRU 24.40, XGBoost regression 21.37",PASS,33.48
+ML11,main,All models vs historical-average baseline (whole test set),Every model has lower MAE,"baseline MAE 32.90; LSTM 23.95, GRU 24.40, XGBoost regression 21.37",PASS,0.01
+ML12,main,Predicting further ahead (15 vs 60 minutes),Error at 60 min >= error at 15 min for every model,"MAE 15 min -> 60 min ahead: LSTM 24.0 -> 30.9, GRU 24.5 -> 36.7, XGBoost regression 21.4 -> 22.8",PASS,0.0
+ML13,main,Output validity over the whole test set,"480 x 40 predictions, all finite and >= 0","LSTM 480x40 OK, GRU 480x40 OK, XGBoost regression 480x40 OK",PASS,0.0
+ML14,main,Repeatability (same input twice),Identical predictions every time,"LSTM identical, GRU identical, XGBoost regression identical",PASS,0.07
+ML15,main,Saved results are permanent,MAE in each metrics.json equals the MAE recomputed from the saved model,"LSTM saved 23.950 / now 23.950, GRU saved 24.401 / now 24.401, XGBoost regression saved 21.374 / now 21.374",PASS,0.29
+ML16,extra,Peak busier than night (site 2000),08:00 prediction > 10 x 03:00 prediction for every model,"8am vs 3am at site 2000: LSTM 1352 vs 24, GRU 1356 vs 42, XGBoost regression 1283 vs 34",PASS,0.04
+ML17,extra,Too little history (1 Oct 01:00),Every model refuses to predict,"LSTM refused (ValueError), GRU refused (ValueError), XGBoost regression refused (ValueError)",PASS,0.0
+ML18,extra,No data leakage between train / validation / test,"Train ends before validation, validation ends before the test days (27 Oct)","train ends 21 Oct 23:45, validation 22 Oct-26 Oct 23:45, test starts 27 Oct 00:00",PASS,0.13
